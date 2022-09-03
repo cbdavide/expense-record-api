@@ -1,0 +1,109 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.6.
+--
+-- see: https://github.com/sol/hpack
+
+name:           expense-record-api
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/cbdavide/expense-record-api#readme>
+homepage:       https://github.com/cbdavide/expense-record-api#readme
+bug-reports:    https://github.com/cbdavide/expense-record-api/issues
+author:         David Castelblanco Benavides
+maintainer:     cbdavides@gmail.com
+copyright:      2022 David Castelblanco Benavides
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/cbdavide/expense-record-api
+
+library
+  exposed-modules:
+      Account.API
+      App
+      Config
+      Database
+      Init
+  other-modules:
+      Paths_expense_record_api
+  hs-source-dirs:
+      src
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , monad-logger
+    , mtl
+    , persistent
+    , persistent-postgresql
+    , safe-exceptions
+    , say
+    , servant
+    , servant-server
+    , text
+    , time
+    , transformers
+    , wai
+    , warp
+  default-language: Haskell2010
+
+executable expense-record-api-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_expense_record_api
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , expense-record-api
+    , monad-logger
+    , mtl
+    , persistent
+    , persistent-postgresql
+    , safe-exceptions
+    , say
+    , servant
+    , servant-server
+    , text
+    , time
+    , transformers
+    , wai
+    , warp
+  default-language: Haskell2010
+
+test-suite expense-record-api-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_expense_record_api
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , expense-record-api
+    , monad-logger
+    , mtl
+    , persistent
+    , persistent-postgresql
+    , safe-exceptions
+    , say
+    , servant
+    , servant-server
+    , text
+    , time
+    , transformers
+    , wai
+    , warp
+  default-language: Haskell2010

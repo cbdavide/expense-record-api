@@ -1,0 +1,29 @@
+Account sql=accounts
+
+    name Text
+    description Text Maybe
+
+    userPublicId Text
+
+    createdAt UTCTime
+    updatedAt UTCTime
+
+    UniqueUserAccountName userPublicId name
+
+    deriving Eq Show Ord
+
+Bucket sql=buckets
+
+    account AccountId
+
+    name Text
+    description Text
+
+    totalBalance Double
+    availableBalance Double
+
+    currency Text
+
+    UniqueAccountBucketName account name
+
+    deriving Eq Show Ord

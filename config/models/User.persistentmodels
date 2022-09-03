@@ -1,0 +1,14 @@
+User sql=users
+
+    name Text
+    handle Text
+
+    publicId Text
+
+    createdAt UTCTime
+    updatedAt UTCTime
+
+    UniqueUserHandle handle
+    UniqueUserPublicId publicId
+
+    deriving Eq Show Ord
