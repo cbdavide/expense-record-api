@@ -3,18 +3,19 @@
 
 module Config where
 
-import Control.Monad.IO.Class (MonadIO)
-import Control.Monad.Except (ExceptT, MonadError)
 import Control.Exception.Safe (throwIO)
+import Control.Monad.Except (ExceptT, MonadError)
+import Control.Monad.IO.Class (MonadIO)
 import Control.Monad.Logger (runNoLoggingT, runStdoutLoggingT)
+import Control.Monad.Reader (ReaderT, asks, MonadReader)
 import Control.Monad.Trans.Class ( MonadTrans(lift) )
 import Control.Monad.Trans.Maybe (MaybeT(..), runMaybeT)
-import Control.Monad.Reader (ReaderT, asks, MonadReader)
-import qualified Data.ByteString.Char8 as BS
 import Database.Persist.Postgresql 
   (ConnectionPool, ConnectionString, createPostgresqlPool)
 import Servant (ServerError)
 import System.Environment (lookupEnv)
+
+import qualified Data.ByteString.Char8 as BS
 
 
 data Environment = Development | Test | Production deriving (Eq, Show, Read)
@@ -41,9 +42,6 @@ makePool Production = do
     let keys = ["host=", "port=", "user=", "password=", "dbname="]
         envs = ["PGHOST", "PGPORT", "PGUSER", "PGPASSWORD", "PGDATABASE"]
 
-    -- traverse :: (Traversable t, Applicative f) => (a -> f b) -> t a -> f (t b)
-    -- traverse :: (String -> MaybeT IO String) -> [String] -> MaybeT IO [String]
-    -- lookuoEnv :: String -> IO (Maybe String)
     envVars <- traverse (MaybeT . lookupEnv) envs
     let prodStr = BS.intercalate " " . zipWith (<>) keys $ BS.pack <$> envVars
     lift $ runStdoutLoggingT $ createPostgresqlPool prodStr (poolConnectionsAmount Production)

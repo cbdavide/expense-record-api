@@ -4,12 +4,13 @@
 module Init where
 
 import Control.Exception.Safe
-import qualified Data.Text as Text
 import Data.Typeable (typeOf)
 import Database.Persist.Postgresql (runSqlPool)
 import Network.Wai.Handler.Warp (run)
 import Say
 import Servant.Server (Application)
+
+import qualified Data.Text as Text
 
 import App (mkApp)
 import Config
@@ -29,14 +30,11 @@ withConfig runAppFromConfig = do
 
 initialize :: Config -> IO Application
 initialize cfg = do
-  -- bracket :: IO a -> (a -> IO b) -> (b -> IO c)
   bracket
-    (say "Satarting to run migrations") -- IO ()
-    (\_ -> say "Finished running migrations") -- a -> IO ()
-    $ \_ -> do -- a -> IO ()
-      say "Running migrations..." -- IO ()
-      -- doMigrations :: SqlPersistT IO ()
-      -- runSqlPool doMigrations pool :: IO ()
+    (say "Satarting to run migrations")
+    (\_ -> say "Finished running migrations")
+    $ \_ -> do
+      say "Running migrations..."
       runSqlPool doMigrations (configPool cfg) `catch` \(SomeException e) -> do
         say $ mconcat
           [ "exception in doMigrations fo type:"
@@ -45,7 +43,7 @@ initialize cfg = do
           , Text.pack . show $ e
           ]
         throwIO e
-      say "Completed runSqlPool" -- IO ()
+      say "Completed runSqlPool"
   return $ mkApp cfg
 
 runApp :: IO ()
