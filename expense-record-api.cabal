@@ -42,6 +42,7 @@ library
     , mtl
     , persistent
     , persistent-postgresql
+    , safe
     , safe-exceptions
     , say
     , servant
@@ -69,6 +70,7 @@ executable expense-record-api-exe
     , mtl
     , persistent
     , persistent-postgresql
+    , safe
     , safe-exceptions
     , say
     , servant
@@ -97,6 +99,7 @@ test-suite expense-record-api-test
     , mtl
     , persistent
     , persistent-postgresql
+    , safe
     , safe-exceptions
     , say
     , servant
