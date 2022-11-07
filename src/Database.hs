@@ -1,15 +1,16 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Database where
 
@@ -22,7 +23,9 @@ import Database.Persist.TH
 import Database.Persist.Quasi
 import Say
 
-import Config (Config, configPool)
+import Config (Config, databaseConnectionPool, DatabaseConfig(..))
+
+import qualified Data.ByteString.Char8 as BS
 
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"]
@@ -32,13 +35,24 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"]
     ]
   )
 
+
 doMigrations :: SqlPersistT IO ()
 doMigrations = do
-  liftIO $ say "Database - Starting migrations"
+  say "Database - Starting migrations"
   runMigration migrateAll
-  liftIO $ say "Database - Migrations ran successfuly"
+  say "Database - Migrations ran successfuly"
+
 
 runDb :: (MonadReader Config m, MonadIO m) => SqlPersistT IO b -> m b
 runDb query = do
-  pool <- asks configPool
+  pool <- asks databaseConnectionPool
   liftIO $ runSqlPool query pool
+
+
+makeDatabasePool :: DatabaseConfig -> IO ConnectionPool
+makeDatabasePool DatabaseConfig{..} = do
+  let keys = ["host=", "port=", "user=", "password=", "dbname="]
+      values = [host, port, user, password, dbname]
+      connStr = BS.intercalate " " . zipWith (<>) keys $ BS.pack <$> values
+
+  runStdoutLoggingT $ createPostgresqlPool connStr poolConnectionsNumber

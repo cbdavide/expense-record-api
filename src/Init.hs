@@ -14,18 +14,20 @@ import qualified Data.Text as Text
 
 import App (mkApp)
 import Config
-import Database (doMigrations)
+import Database (doMigrations, makeDatabasePool)
 
 withConfig :: (Config -> IO a) -> IO a
 withConfig runAppFromConfig = do
   say "Creating configuration"
   let env = Development
 
-  !pool <- makePool env
+  dbConfig <- getDatabaseConfig
+
+  !pool <- makeDatabasePool dbConfig 
 
   runAppFromConfig $ Config
     { configEnv = env,
-      configPool = pool
+      databaseConnectionPool = pool
     }
 
 initialize :: Config -> IO Application
@@ -35,7 +37,7 @@ initialize cfg = do
     (\_ -> say "Finished running migrations")
     $ \_ -> do
       say "Running migrations..."
-      runSqlPool doMigrations (configPool cfg) `catch` \(SomeException e) -> do
+      runSqlPool doMigrations (databaseConnectionPool cfg) `catch` \(SomeException e) -> do
         say $ mconcat
           [ "exception in doMigrations fo type:"
           , Text.pack . show $ (typeOf e)
